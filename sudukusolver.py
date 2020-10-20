@@ -47,29 +47,21 @@ class SudukuSolver:
     def resolve_row(self, coord):
         """ Removes the possible values from other column entries based on the new value inserted """
         coords = [(coord.x_ind, y) for y in list(range(9)) if y != coord.y_ind]
-        for x, y in coords:
-            if isinstance(self.possible_values.iloc[x, y], list) and \
-                self.possible_values.iloc[coord.x_ind, coord.y_ind] in self.possible_values.iloc[x, y]:
-                self.possible_values.iloc[x, y].remove(self.possible_values.iloc[coord.x_ind, coord.y_ind])
-            if isinstance(self.possible_values.iloc[x, y], list) and len(self.possible_values.iloc[x, y]) == 1:
-                self.unresolved_coords.append(Coord(x+1, y+1))
-                self.possible_values.iloc[x, y] = self.possible_values.iloc[x, y][0]
+        self.resolve(coord, coords)
 
     def resolve_column(self, coord):
         """ Removes the possible values from other row entries based on the new value inserted """
         coords = [(x, coord.y_ind) for x in list(range(9)) if x != coord.x_ind]
-        for x, y in coords:
-            if isinstance(self.possible_values.iloc[x, y], list) and \
-                    self.possible_values.iloc[coord.x_ind, coord.y_ind] in self.possible_values.iloc[x, y]:
-                self.possible_values.iloc[x, y].remove(self.possible_values.iloc[coord.x_ind, coord.y_ind])
-            if isinstance(self.possible_values.iloc[x, y], list) and len(self.possible_values.iloc[x, y]) == 1:
-                self.unresolved_coords.append(Coord(x + 1, y + 1))
-                self.possible_values.iloc[x, y] = self.possible_values.iloc[x, y][0]
+        self.resolve(coord, coords)
 
     def resolve_box(self, coord):
         """ Removes the possible values from other entries in the box based on the new value inserted """
         coords = itertools.product(list(range((3*(coord.get_x_box()-1)), 3*coord.get_x_box())),
                                    list(range((3*(coord.get_y_box()-1)), 3*coord.get_y_box())))
+        self.resolve(coord, coords)
+
+    def resolve(self, coord, coords):
+        """ Removes the value at posotion 'coord' from all of the coordinates in the list coords"""
         for (x, y) in coords:
             if isinstance(self.possible_values.iloc[x, y], list) and \
                     self.possible_values.iloc[coord.x_ind, coord.y_ind] in self.possible_values.iloc[x, y]:
